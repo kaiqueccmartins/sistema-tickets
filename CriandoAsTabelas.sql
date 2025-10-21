@@ -58,4 +58,14 @@ CREATE TABLE tickets (
     FOREIGN KEY (status_id)
     REFERENCES status (status_id)
     ON DELETE RESTRICT
+
+-- Alterações para poder visualizar dados de FRT, TTR e Reopen Rate.
+ALTER TABLE tickets
+ADD COLUMN IF NOT EXISTS first_response_at TIMESTAMP;
+
+ALTER TABLE tickets
+ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMP;
+
+ALTER TABLE tickets
+ADD COLUMN IF NOT EXISTS reopened BOOLEAN DEFAULT FALSE;
   );
