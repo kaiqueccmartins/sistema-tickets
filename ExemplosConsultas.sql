@@ -70,3 +70,26 @@ FROM tickets t
 JOIN status s ON t.status_id = s.status_id
 ORDER BY t.updated_at DESC NULLS LAST
 LIMIT 10;
+
+-- Adicionando exemplos de consultas para métricas de suporte
+
+-- FRT — First Response Time (Tempo até a primeira resposta)
+SELECT 
+  ROUND(AVG(EXTRACT(EPOCH FROM (first_response_at - created_at)) / 3600), 2) AS avg_first_response_time_hours
+FROM tickets
+WHERE first_response_at IS NOT NULL;
+
+-- TTR — Time to Resolution (Tempo até a resolução)
+SELECT 
+  ROUND(AVG(EXTRACT(EPOCH FROM (resolved_at - created_at)) / 3600), 2) AS avg_resolution_time_hours
+FROM tickets
+WHERE resolved_at IS NOT NULL;
+
+-- Reopen Rate — Taxa de reabertura de tickets
+SELECT 
+  ROUND(
+    (COUNT(*) FILTER (WHERE reopened = TRUE)::decimal / COUNT(*)) * 100,
+    2
+  ) AS reopen_rate_percent
+FROM tickets;
+
