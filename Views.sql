@@ -42,3 +42,15 @@ FROM tickets t
 JOIN agents a ON t.agent_id = a.agent_id
 WHERE t.closed_at IS NOT NULL
 GROUP BY a.name;
+
+-- ADICIONANDO VIEW CONSOLIDADA PARA MÉTRICAS DE SUPORTE (FRT, TTR E REOPEN RATE)
+CREATE OR REPLACE VIEW support_metrics AS
+SELECT
+  ROUND(AVG(EXTRACT(EPOCH FROM (first_response_at - created_at)) / 3600), 2) AS avg_first_response_time_hours,
+  ROUND(AVG(EXTRACT(EPOCH FROM (resolved_at - created_at)) / 3600), 2) AS avg_resolution_time_hours,
+  ROUND(
+    (COUNT(*) FILTER (WHERE reopened = TRUE)::decimal / COUNT(*)) * 100,
+    2
+  ) AS reopen_rate_percent
+FROM tickets
+WHERE created_at IS NOT NULL;
